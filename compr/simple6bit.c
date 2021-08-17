@@ -101,18 +101,38 @@ void writeChar(char c, char* buff, int* bit, FILE* file){
 void main(int argc, char** argv){
 	FILE* bible;
 	FILE* compr;
-	bible = fopen(argv[1], "r");
-	compr = fopen(argv[2], "w");
+	if((bible = fopen(argv[1], "r")) == NULL){
+		printf("Can't open file %s for reading.\n", argv[1]);
+		return;
+	}
+	if((compr = fopen(argv[2], "w")) == NULL){
+		printf("Can't open file %s for writing.\n", argv[2]);
+		return;
+	}
 
 	initEnc();
 
 	char c, buff[2];
 	int bit = 0;
+	int chap, vers;
 
 	while((c = getc(bible)) != EOF){
-		if(c >= LEN || c < 0 || (c != 0 && !enc[c])){
-			printf("Error: Unknown character %d.", c);
-			/* Write book/chapter/verse characters. */
+		if(c == 10){
+			if(fscanf(bible, "%d:%d ", &chap, &vers)){
+				/* Verse start. */
+				writeChar(0, buff, &bit, compr);
+				if(vers == 1){
+					/* Chapterstart. */
+					writeChar(0, buff, &bit, compr);
+				}
+			}else{
+				/* Book start. */
+				writeChar(0, buff, &bit, compr);
+				writeChar(0, buff, &bit, compr);
+				writeChar(0, buff, &bit, compr);
+			}
+		}else if(c >= LEN || c < 0 || (c != 0 && !enc[c])){
+			//printf("Error: Unknown character %d.\n", c);
 		}else{
 			writeChar(enc[c], buff, &bit, compr);
 		}
@@ -120,7 +140,7 @@ void main(int argc, char** argv){
 
 	/* EOF */
 	for(int i = 0; i < 4; i++) writeChar(0, buff, &bit, compr);
-	if(bit != 0) fputc(buff[0], compr);
+	if(bit != 0) putc(buff[0], compr);
 
 	fclose(bible);
 	fclose(compr);
