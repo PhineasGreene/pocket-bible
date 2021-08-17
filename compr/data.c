@@ -2,27 +2,25 @@
 
 #define LEN 256
 
-int chars[LEN], total;
+int chars[LEN], total, unique;
 
-void main(){
+void main(int argc, char **argv){
 	FILE* bible;
-	bible = fopen("kjv.bible", "r");
+	bible = fopen(argv[1], "r");
 
 	total = 0;
+	unique = 0;
 	for(int i = 0; i < LEN; i++) chars[i] = 0;
 
 	char c;
-	int pos=0;
 
 	while((c = getc(bible)) != EOF){
 		if(chars[c] == 0){
-			total++;
+			unique++;
 		}
-		if(c == 0) printf("pos %d\n", pos);
+		total++;
 		chars[c]++;
-		pos++;
 	}
-		printf("pos %d\n", pos);
 
 	fclose(bible);
 
@@ -33,5 +31,6 @@ void main(){
 		}
 	}
 
-	printf("Unique characters: %d\n", total);
+	printf("Unique characters: %d\n", unique);
+	printf("Total characters: %d\n", total);
 }
