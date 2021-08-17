@@ -42,6 +42,7 @@ char enc[LEN];
 void initEnc(){
 	/* Give every used character in encoding array "enc"
 	 * (indexed by ascii value) its new value. */
+	for(int i = 0; i < LEN; i++) enc[i] = 0; // For errors
 	enc[32] = 1; // " "
 	enc[33] = 2; // "!"
 	enc[39] = 3; // "'"
@@ -72,24 +73,24 @@ void writeChar(char c, char* buff, int* bit, FILE* file){
 			*bit = 6;
 			break;
 		case 6:
-			buff[0] += c >> 4;
+			buff[0] += (c >> 4);
 			buff[1] += c << 4;
-			fputc(buff[0], file);
+			putc(buff[0], file);
 			buff[0] = buff[1];
 			buff[1] = 0;
 			*bit = 4;
 			break;
 		case 4:
-			buff[0] += c >> 2;
+			buff[0] += (c >> 2);
 			buff[1] += c << 6;
-			fputc(buff[0], file);
+			putc(buff[0], file);
 			buff[0] = buff[1];
 			buff[1] = 0;
 			*bit = 2;
 			break;
 		case 2:
 			buff[0] += c;
-			fputc(buff[0], file);
+			putc(buff[0], file);
 			buff[0] = buff[1];
 			buff[1] = 0;
 			*bit = 0;
@@ -109,7 +110,8 @@ void main(int argc, char** argv){
 	int bit = 0;
 
 	while((c = getc(bible)) != EOF){
-		if(c == 10){ // newline
+		if(c >= LEN || c < 0 || (c != 0 && !enc[c])){
+			printf("Error: Unknown character %d.", c);
 			/* Write book/chapter/verse characters. */
 		}else{
 			writeChar(enc[c], buff, &bit, compr);
