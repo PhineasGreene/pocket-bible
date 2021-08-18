@@ -1,3 +1,6 @@
+/* Get information about the characters (ASCII) present
+ * in a file. Usage: data [ASCII file]. */
+
 #include <stdio.h>
 
 #define LEN 256
