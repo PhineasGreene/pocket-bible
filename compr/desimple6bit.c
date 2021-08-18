@@ -58,14 +58,6 @@ void initEnc(){
 	for(int i = 97; i <= 122; i++) enc[i - 59] = i;
 }
 
-void printBits(char c){
-	for(int i = 0; i < 8; i++){
-		char mask = 1 << (7 - i);
-		char bit = c & mask;
-		printf(bit ? "1" : "0");
-	}
-}
-
 void decodeChar(char* out, char* c, int* bit, FILE* file){
 	/* Read from current character pulled from stream
 	 * from bit "bit" to the end of the byte. Then (if
@@ -102,8 +94,15 @@ void decodeChar(char* out, char* c, int* bit, FILE* file){
 void main(int argc, char** argv){
 	FILE* bible;
 	FILE* compr;
-	bible = fopen(argv[2], "w");
-	compr = fopen(argv[1], "r");
+
+	if((bible = fopen(argv[2], "w")) == NULL){
+		printf("Can't open file %s for writing.\n", argv[2]);
+		return;
+	}
+	if((compr = fopen(argv[1], "r")) == NULL){
+		printf("Can't open file %s for reading.\n", argv[1]);
+		return;
+	}
 
 	initEnc();
 
@@ -120,11 +119,18 @@ void main(int argc, char** argv){
 		if(out == 0){
 			cvc++;
 			if(cvc == 4) break; // EOF
+			continue;
 		}else if(cvc){
-			
-		}else{
-			putc(enc[out], bible);
+			switch(cvc){
+				case 1: // verse
+					break;
+				case 2: // chapter
+					break;
+				case 3: // book
+					break;
+			}
 		}
+		putc(enc[out], bible);
 	}
 
 	fclose(bible);

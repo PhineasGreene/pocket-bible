@@ -101,6 +101,7 @@ void writeChar(char c, char* buff, int* bit, FILE* file){
 void main(int argc, char** argv){
 	FILE* bible;
 	FILE* compr;
+
 	if((bible = fopen(argv[1], "r")) == NULL){
 		printf("Can't open file %s for reading.\n", argv[1]);
 		return;
@@ -132,7 +133,7 @@ void main(int argc, char** argv){
 				writeChar(0, buff, &bit, compr);
 			}
 		}else if(c >= LEN || c < 0 || (c != 0 && !enc[c])){
-			//printf("Error: Unknown character %d.\n", c);
+			printf("Error: Unknown character %d.\n", c);
 		}else{
 			writeChar(enc[c], buff, &bit, compr);
 		}
