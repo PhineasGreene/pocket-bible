@@ -10,6 +10,31 @@ struct Tree {
 	struct Tree* right;
 };
 
+/* How are you meant to format these nicely? */
+bool treeEq(struct Tree a, struct Tree b);
+void printTree(struct Tree n);
+void sort(struct Tree* tree, int l);
+struct Tree* findTree(struct Tree target, struct Tree* trees, int l);
+int treeDepth(struct Tree tree);
+struct Tree growHuffman(struct Tree* treeData, FILE* file);
+void count(struct Tree* tree, FILE* file);
+
+int main(int argc, char** argv){
+	FILE* bible;
+	
+	if((bible = fopen(argv[1], "r")) == NULL){
+		printf("Problem opening file %s for reading.", argv[1]);
+	}
+
+	struct Tree treeData[256*2];
+
+	struct Tree huffman = growHuffman(treeData, bible);
+
+	printTree(huffman);
+	printf("\n");
+	printf("Depth %d\n", treeDepth(huffman));
+}
+
 bool treeEq(struct Tree a, struct Tree b){
 	return a.n == b.n && a.c == b.c && a.left == b.left && a.right == b.right;
 }
@@ -57,39 +82,19 @@ struct Tree* findTree(struct Tree target, struct Tree* trees, int l){
 	return NULL;
 }
 
-void count(struct Tree* tree, FILE* file){
-	int counts[256];
-	for(int i = 0; i < 256; i++) counts[i] = 0;
-
-	char c;
-	while((c = getc(file)) != EOF){
-		counts[c]++;
-	}
-
-	int fi = 0;
-
-	for(int i = 0; i < 256; i++){
-		struct Tree n;
-		n.n = counts[i];
-		n.c = i;
-		n.left = NULL;
-		n.right = NULL;
-		tree[fi] = n;
-		fi++;
+int treeDepth(struct Tree tree){
+	if(tree.c != '\0') return 1;
+	else{
+		int leftD = tree.left != NULL ? treeDepth(*tree.left) : 0;
+		int rightD = tree.right != NULL ? treeDepth(*tree.right) : 0;
+		return 1 + (leftD > rightD ? leftD : rightD);
 	}
 }
 
-int main(int argc, char** argv){
-	FILE* bible;
-	
-	if((bible = fopen(argv[1], "r")) == NULL){
-		printf("Problem opening file %s for reading.", argv[1]);
-	}
-
-	struct Tree treeData[256*2];
+struct Tree growHuffman(struct Tree* treeData, FILE* file){
 	int dataIndex = 256;
 
-	count(treeData, bible);
+	count(treeData, file);
 
 	struct Tree tree[256];
 	int len = 0;
@@ -119,8 +124,27 @@ int main(int argc, char** argv){
 		sort(tree, len);
 	}
 
-	struct Tree huffman = tree[0];
-	free(tree);
-	printTree(huffman);
-	printf("\n");
+	return tree[0];
+}
+
+void count(struct Tree* tree, FILE* file){
+	int counts[256];
+	for(int i = 0; i < 256; i++) counts[i] = 0;
+
+	char c;
+	while((c = getc(file)) != EOF){
+		counts[c]++;
+	}
+
+	int fi = 0;
+
+	for(int i = 0; i < 256; i++){
+		struct Tree n;
+		n.n = counts[i];
+		n.c = i;
+		n.left = NULL;
+		n.right = NULL;
+		tree[fi] = n;
+		fi++;
+	}
 }

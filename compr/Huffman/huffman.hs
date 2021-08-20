@@ -1,6 +1,5 @@
 import System.Environment
 import System.IO
-import Data.ByteString
 import Data.Bits
 import Data.Function (on)
 import Data.List
@@ -45,14 +44,11 @@ encodeChar c (Branch l r) | search l c = False:(encodeChar c l)
 encode :: [(Tree, Int)] -> String -> String
 encode = undefined
 
-printBits :: Char -> String
-printBits c = (str 0) ++ (str 1) ++ (str 2) ++ (str 3) ++ (str 4) ++ (str 5) ++ (str 6) ++ (str 7)
-    where str i = if testBit c i then "1" else "0"
-
 main = do
     args <- getArgs
-    bibText <- readFile $ args !! 0
+    bibText <- readFile $ "../../kjv.bible"
     let count = countChars bibText
+    putStrLn $ show $ hufftree count
     let header = printCount count
     let out = header ++ (encode count bibText)
     writeFile (args !! 1) out
