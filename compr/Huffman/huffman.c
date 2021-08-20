@@ -1,38 +1,71 @@
+#include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #define MAX_INT 2147483647
 
 struct Tree {
 	int n;
-	char c;
+	char c; // If branch, null.
 	struct Tree* left;
 	struct Tree* right;
 };
 
+struct HuffChar {
+	char* bits; // A string of the characters '1' and '0'
+	int l; // Length of bits.
+};
+
 /* How are you meant to format these nicely? */
+
+/* Return true Tree a is identical to Tree b. */
 bool treeEq(struct Tree a, struct Tree b);
+/* Print a tree to stdout. Format: {left, right} */
 void printTree(struct Tree n);
+/* Sort a list of trees from highest n to lowest. */
 void sort(struct Tree* tree, int l);
+/* Find a tree in a list and return its pointer. */
 struct Tree* findTree(struct Tree target, struct Tree* trees, int l);
-int treeDepth(struct Tree tree);
+//int treeDepth(struct Tree tree);
+/* Create a huffman tree from a file, using treeData
+ * to store nodes and leaves. */
 struct Tree growHuffman(struct Tree* treeData, FILE* file);
-void count(struct Tree* tree, FILE* file);
+/* Populate list trees with leaves for every value
+ * of tree.c. Tree.n is the number of times that
+ * character occurs in the file. */
+void count(struct Tree* trees, FILE* file);
+/* Create a lookup table for characters to find
+ * their huffman encoding. */
+void huffTable(struct HuffChar* table, struct Tree tree, char* bits, int len);
 
 int main(int argc, char** argv){
 	FILE* bible;
+
+	if(argc < 2){
+		printf("Not enough arguments.\n");
+		return 1;
+	}
 	
 	if((bible = fopen(argv[1], "r")) == NULL){
 		printf("Problem opening file %s for reading.", argv[1]);
+		return 1;
 	}
 
 	struct Tree treeData[256*2];
+	struct HuffChar table[256];
 
-	struct Tree huffman = growHuffman(treeData, bible);
+	for(int i = 0; i < 256; i++){
+		struct HuffChar hc;
+		hc.l = 0;
+		table[i] = hc;
+	}
 
-	printTree(huffman);
-	printf("\n");
-	printf("Depth %d\n", treeDepth(huffman));
+	huffTable(table, growHuffman(treeData, bible), "", 0);
+
+	for(int i = 0; i < 256; i++){
+		if(table[i].l) printf("%c: %s %d\n", i, table[i].bits, table[i].l);
+	}
 }
 
 bool treeEq(struct Tree a, struct Tree b){
@@ -82,6 +115,7 @@ struct Tree* findTree(struct Tree target, struct Tree* trees, int l){
 	return NULL;
 }
 
+/*
 int treeDepth(struct Tree tree){
 	if(tree.c != '\0') return 1;
 	else{
@@ -89,7 +123,7 @@ int treeDepth(struct Tree tree){
 		int rightD = tree.right != NULL ? treeDepth(*tree.right) : 0;
 		return 1 + (leftD > rightD ? leftD : rightD);
 	}
-}
+}*/
 
 struct Tree growHuffman(struct Tree* treeData, FILE* file){
 	int dataIndex = 256;
@@ -127,7 +161,7 @@ struct Tree growHuffman(struct Tree* treeData, FILE* file){
 	return tree[0];
 }
 
-void count(struct Tree* tree, FILE* file){
+void count(struct Tree* trees, FILE* file){
 	int counts[256];
 	for(int i = 0; i < 256; i++) counts[i] = 0;
 
@@ -144,7 +178,24 @@ void count(struct Tree* tree, FILE* file){
 		n.c = i;
 		n.left = NULL;
 		n.right = NULL;
-		tree[fi] = n;
+		trees[fi] = n;
 		fi++;
+	}
+}
+
+void huffTable(struct HuffChar* table, struct Tree tree, char* bits, int len){
+	if(tree.c != '\0'){
+		table[tree.c].l = len;
+		table[tree.c].bits = (char *) malloc(len);
+		strcpy(table[tree.c].bits, bits);
+		table[tree.c].bits[len] = '\0';
+	}else{
+		char b[len + 1];
+		strcpy(b, bits);
+
+		b[len] = '0';
+		huffTable(table, *tree.left, b, len + 1);
+		b[len] = '1';
+		huffTable(table, *tree.right, b, len + 1);
 	}
 }
