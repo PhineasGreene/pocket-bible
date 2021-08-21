@@ -1,3 +1,5 @@
+/* Usage: dehuffman [Compressed file] [Decompressed file] */
+
 #include "tree.h"
 
 /* Read a character from the header. */

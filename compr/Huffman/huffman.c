@@ -1,3 +1,5 @@
+/* Usage: huffman [ASCII file] [Compressed file] */
+
 #include "tree.h"
 
 /* Write the encodings for every character used to the
