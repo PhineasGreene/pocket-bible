@@ -1,0 +1,12 @@
+# Ignore files with no extensions.
+*
+!*.*
+!*/
+
+# Ignore output files. From compressors and decompressors.
+*.cmprbib
+*.bible
+
+# Unignore our base bibles.
+!kjv.bible
+!verseless.kjv.bible
