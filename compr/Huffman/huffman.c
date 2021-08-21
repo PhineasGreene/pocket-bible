@@ -1,18 +1,11 @@
 #include "tree.h"
 
+/* Write the encodings for every character used to the
+ * top of the output file. */
 void writeHeader(struct HuffChar* table, FILE* out);
-
-void printBits(char c){
-	for(int i = 0; i < 8; i++){
-		char mask = 1 << (7 - i);
-		char bit = c & mask;
-		printf(bit ? "1" : "0");
-	}
-	printf("\n");
-}
-
+/* Set bit "bit" of byte "c" to value "v". */
 char setBit(char c, int bit, int v);
-
+/* Write huffman character "c" to a file. */
 void writeHuffChar(struct HuffChar c, int* bit, char* byte,  FILE* file);
 
 int main(int argc, char** argv){
@@ -69,7 +62,7 @@ int main(int argc, char** argv){
 void writeHeader(struct HuffChar* table, FILE* out){
 	for(int i = 0; i < 256; i++){
 		if(table[i].l > 0){
-			fprintf(out, "%c%s", i, table[i].bits);
+			fprintf(out, "#%c%s", i, table[i].bits);
 		}
 	}
 
