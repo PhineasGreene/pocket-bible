@@ -1,0 +1,18 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[usefilenames,RMstyle=ExtraLight,SSstyle=ExtraLight,TTstyle=ExtraLight,DefaultFeatures={Ligatures=NoCommon}]{plex-otf} %
+\renewcommand*\familydefault{\ttdefault} %% Only if the base font of the document is to be monospaced
+
+\def\enablehyph#1{\enablehyphA #1\end}
+\def\enablehyphA#1{\ifx\end#1\unskip\unpenalty
+   \else#1\penalty0\hskip0pt plus1pt\relax
+   \expandafter\enablehyphA\fi}
+
+\begin{document}
+
+\scriptsize
+
+\input{code.txt}
+
+\end{document}
