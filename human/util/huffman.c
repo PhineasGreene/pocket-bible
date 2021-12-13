@@ -41,20 +41,19 @@ int main(int argc, char** argv){
 
 	huffTable(table, huffman, "", 0);
 
-	writeHeader(table, out);
-
 	char c;
 	int bit;
 	char byte = 0;
 
 	rewind(bible);
+	
+	writeHeader(table, out);
 
 	while((c = getc(bible)) != EOF){
 		writeHuffChar(table[c], &bit, &byte, out);	
 	}
 	//
-	// EOF
-	writeHuffChar(table[4], &bit, &byte, out);
+	writeHuffChar(table[4], &bit, &byte, out);	
 	putc(byte, out);
 
 	fclose(bible);
@@ -64,12 +63,9 @@ int main(int argc, char** argv){
 void writeHeader(struct HuffChar* table, FILE* out){
 	for(int i = 0; i < 256; i++){
 		if(table[i].l > 0){
-			fprintf(out, "#%c%s", i, table[i].bits);
 			printf("%d, \"%c\" : %s\n", i, i, table[i].bits);
 		}
 	}
-
-	putc(3, out);
 }
 
 char setBit(char c, int bit, int v){
