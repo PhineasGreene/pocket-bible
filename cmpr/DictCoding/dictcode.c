@@ -71,7 +71,7 @@ int main(int argc, char** argv){
 
 	// populate a word list array based on dictionary
 	int length = dictionary.len;
-	char* wordList[length];
+	char* wordList[length + 1];
 	buildWordList(wordList, dictionary);
 
 	// free the memory we allocated for dictionary
@@ -129,6 +129,9 @@ void encFile(char** wl, int wllen, FILE* input, FILE* output){
 			wordBuff[0] = '\0';
 		}
 	}
+
+	writeWord(wllen, size, &byte, &pos, output);
+	putc(byte, output);
 }
 
 void writeHeader(char** wl, int wllen, FILE* output){
