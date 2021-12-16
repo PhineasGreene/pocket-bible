@@ -49,8 +49,8 @@ void decFile(FILE* input, FILE* output, char** wl, int wllen){
 
 	while((word = readWord(input, size, &byte, &pos)) != wllen){
 		if(word < 0 || word > wllen){
-			printf("Bad word.\n");
-			continue;
+			printf("Bad word %d.\n", word);
+			exit(1);
 		}
 		// put a space for words containing letters
 		if((wl[word][0] >= 65 && wl[word][0] <= 90) ||
