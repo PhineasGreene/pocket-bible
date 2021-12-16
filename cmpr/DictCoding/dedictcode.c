@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -6,7 +5,6 @@
 #define MAX_WORD 32
 
 void decFile(FILE* input, FILE* output, char** wl, int wllen);
-char* decWord(int code);
 int readWord(FILE* file, int size, unsigned char* byte, int* pos);
 void readWordList(FILE* file, char** wl, int wllen);
 int wordSize(int words);
@@ -35,18 +33,7 @@ int main(int argc, char** argv){
 	char* wordList[length];
 	readWordList(input, wordList, length);
 
-	unsigned char byte = getc(input);
-	int pos = 0;
-	int w = readWord(input, wordSize(length), &byte, &pos);
-
-	printf("%d", w);
-	printf(" %s\n", wordList[w]);
-	w = readWord(input, wordSize(length), &byte, &pos);
-	printf("%d", w);
-	printf(" %s\n", wordList[w]);
-	w = readWord(input, wordSize(length), &byte, &pos);
-	printf("%d", w);
-	printf(" %s\n", wordList[w]);
+	decFile(input, output, wordList, length);
 
 	fclose(input);
 	fclose(output);
@@ -54,11 +41,32 @@ int main(int argc, char** argv){
 	return 0;
 }
 
+void decFile(FILE* input, FILE* output, char** wl, int wllen){
+	unsigned char byte = getc(input);
+	int pos = 0;
+	int size = wordSize(wllen);
+	int word = 0;
+
+	while((word = readWord(input, size, &byte, &pos)) != wllen){
+		if(word < 0 || word > wllen){
+			printf("Bad word.\n");
+			continue;
+		}
+		// put a space for words containing letters
+		if((wl[word][0] >= 65 && wl[word][0] <= 90) ||
+		   (wl[word][0] >= 97 && wl[word][0] <= 122)){
+			putc(' ', output);
+		}
+		// write word to output
+		fprintf(output, "%s", wl[word]);
+	}
+}
+
 int readWord(FILE* file, int size, unsigned char* byte, int* pos){
 	char mask = 1 << 7;
 	int word = 0;
 
-	for(int i = 0; i <= size; i++){
+	for(int i = 0; i < size; i++){
 		word <<= 1;
 		word += ((*byte & mask) ? 1 : 0);
 		
@@ -99,13 +107,3 @@ int wordSize(int words){
 	return b;
 }
 
-
-bool isSingleCharWord(char c){
-	if(c >= 48 && c <= 57) return false; // digits
-	if(c >= 65 && c <= 90) return false; // caps
-	if(c >= 97 && c <= 122) return false; // smalls
-	if(c == 39) return false; // apostrophe
-	if(c <= 32) return false; // space, newline, control
-
-	return true;
-}
